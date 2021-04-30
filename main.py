@@ -7,7 +7,18 @@ from pytube import YouTube
 from requests import get
 from json import loads
 from time import sleep
-h = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.2; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36'}
+
+h = {
+"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:88.0) Gecko/20100101 Firefox/88.0",
+"X-Goog-Visitor-Id": "CgthdGpyYWlHdk9nVSjymqqEBg%3D%3D",
+"Authorization": "SAPISIDHASH 1619693123_8ea3c66e1054989f4a6762b77eba22ee8128f5c8",
+"X-Goog-AuthUser": "1",
+"X-YouTube-Device": "cbr=Firefox&cbrver=88.0&ceng=Gecko&cengver=88.0&cos=Windows&cosver=10.0&cplatform=DESKTOP",
+"X-Youtube-Identity-Token": "QUFFLUhqblR1VkpHZC1DVW5YOGxXanZfVGVMOFlZT19EZ3w=",
+"Referer": "https://www.youtube.com/playlist?list=PL_5CDyjJ07J2rmnHWlccmOTXtp3_N122s",
+"Cookie": "CONSENT=YES+cb.20210425-18-p0.fr+FX+781; VISITOR_INFO1_LIVE=atjraiGvOgU; PREF=f6=40000400&tz=Europe.Paris&f5=30000; SID=8gczL8eNlnQyrfJjJ1GXsWm0InlJiHZz40McDkUeze4F9LRyK5n9dizCUyZKnHLCXV6FkA.; __Secure-3PSID=8gczL8eNlnQyrfJjJ1GXsWm0InlJiHZz40McDkUeze4F9LRykX6S9Uk1n96-_KBaCj99Sg.; HSID=AB_PwFZDBU_Vf13i9; SSID=AyVEce7Zzorworowj; APISID=ev1sUP0DjzQSTTbe/AzUihrz05MFizNij5; SAPISID=hSwa-i7KdEXnGaVW/A5sdXbR6aWNzxpbLq; __Secure-3PAPISID=hSwa-i7KdEXnGaVW/A5sdXbR6aWNzxpbLq; LOGIN_INFO=AFmmF2swRQIgaCqE1-1syE102JwswtI4O71ySmeLXoPHXF6mcd1AkHgCIQCR9cRlQB2If6zk2sAa3nUAhKx7uqRYGOIRod57RBNgLA:QUQ3MjNmd0lGOUd6Y3pjTlFWdmlqdkEwdVZMZTdMR3FrX2ROYmZNZi0tV3VLUENuYUhaeExnNDFVUkQ3SDQ3WXUzcFNFQ1pnd0pPdnJNRWxYbUw5SHdaanFjZjRSZDBrVG92MmtOSXlWRzhWdVdfaE9VXzc1a1ZidzhGR1hCSDRQTEZUbTJJWkpSNnBobVNvbzJMdHJ5ejBpbHN2UjRabmtGalpGa3RDWkwzRUhBNlhId01UMGx3VVNrRWVBUjd0WGtib0FMeGdmeG9r; SIDCC=AJi4QfGuq6BYU7EqXzXohgiv8wGLNW2rhO0oOwIv4-WjQUoYCpj7-RtY381dq60aE_jVHPLWhQk; __Secure-3PSIDCC=AJi4QfHEdo80S0TlxW4r7OYHQDsZQ0hYhFBT6xWAAGZknzPcRwgaDEoUzqGcsapw0RzRBYxb2Q; YSC=gMzvtxhvkAQ; wide=1; CONSISTENCY=AGDxDeNcoYIDorlTBegUvVTLg3BOqJlO3rw10VD1hSZC5RRo0HIVS1tN7s22F4VMK7EidN97g_jg0OuTxlKT7Lm8YngleYOxWAAgXwg-nB10H8l608VqRdLZw7WSh0RIDZAzaJ4oLHLrKa1CRd4rZFC4"
+}
+
 
 try: mkdir("YoutubeDownloader")
 except: pass
@@ -19,10 +30,10 @@ except: pass
 def getIndividualLinks(link):
 	if "playlist" in link:
 		r = get(link, headers=h)
+		with open("t.html", "w", encoding="utf8") as file: file.write(r.text)
 		l = []
 		for i in r.text.split("\n"):
 			if "videoId" in i:
-				t = i.split("var ytInitialData = ")
 				for j in t[1].replace("}", "}\n").split("\n"):
 					if "watchEndpoint" in j and "\"index\":" in j:
 						l += ["https://youtube.com/watch?v="+j.split("\"")[5]]
@@ -33,7 +44,7 @@ def getIndividualLinks(link):
 		return [f"https://youtube.com/watch?v={link.split('/')[-1]}"]
 	else:
 		print("no valid")
-getName = lambda link: loads(get("https://www.youtube.com/oembed?url=" + link + "&format=json", headers=h).text)["title"]
+getName = lambda link: loads(get("https://www.youtube.com/oembed?url=" + link + "&format=json", headers={'User-Agent': 'Mozilla/5.0 (Windows NT 6.2; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36'}).text)["title"]
 
 class mainWindow(QMainWindow):
 	def __init__(self):
@@ -77,11 +88,8 @@ class mainWindow(QMainWindow):
 	def updateTable(self, l):
 		self.linksTable.item(l[0], 2).setText(l[1])
 	def deleteFile(self, path):
-		try:
-			remove(path)
-		except:
-			print(path)
-
+		try: remove(path)
+		except: print(path)
 
 	def resizeEvent(self, e):
 		header = self.linksTable.horizontalHeader()
