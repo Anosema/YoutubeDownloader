@@ -30,11 +30,10 @@ except: pass
 def getIndividualLinks(link):
 	if "playlist" in link:
 		r = get(link, headers=h)
-		with open("t.html", "w", encoding="utf8") as file: file.write(r.text)
 		l = []
 		for i in r.text.split("\n"):
 			if "videoId" in i:
-				for j in t[1].replace("}", "}\n").split("\n"):
+				for j in i.replace("}", "}\n").split("\n"):
 					if "watchEndpoint" in j and "\"index\":" in j:
 						l += ["https://youtube.com/watch?v="+j.split("\"")[5]]
 		return l
@@ -111,6 +110,7 @@ class downloaderThread(QThread):
 		self.fileRemover.connect(self.parent().deleteFile)
 
 	def run(self):
+		print(self.link)
 		if self.parent().mode == "Great audio, no video":
 			self.tableUpdater.emit((self.x, "Processing"))
 			yt = YouTube(self.link)
